@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// @default = valor padrão do campo
+// @unique = valor unico do campo, não pode haver dois com o mesmo valor
+// now() = valor da data atual quando o registro foi criado
+
+// cada usuário poderá ter várias memórias
+// Memory[] = lista de memórias
+// indica relacionamento 1 para muitos
+
+// Não é criada uma nova coluna, apenas indica para o prisma que há 
+// o relacionamento
+model User {
+  id        String   @id @default(uuid())
+  gitHubId  Int      @unique
+  nome      String
+  login     String
+  avatarUrl String
+  memories  Memory[]
+}
+
+// cada usuário poderá ter várias memórias, o relacionamento foi criado abaixo
+// @relation = cria o relacionamento
+// fields = qual campo é a FK, references = qual campo é a PK do outro model
+model Memory {
+  id        String   @id @default(uuid())
+  userId    String
+  coverUrl  String
+  content   String
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
